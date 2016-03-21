@@ -5,20 +5,66 @@
  */
 package Principales;
 
+import Imagenes.Desktop.ImagenFondo;
 import Interfaces.internas.*;
+import conexiones.QueryDoc;
+import java.util.Calendar;
+import java.util.*;
+
 
 /**
  *
  * @author pxblo
  */
-public class Principal extends javax.swing.JFrame {
+public class Principal extends javax.swing.JFrame implements Runnable{
+
+String hora,minutos,segundos,ampm;
+Calendar calendario;
+Thread h1;
 
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
+        this.setExtendedState(Principal.MAXIMIZED_BOTH);//ventana expandida
+       
+        this.jDesktopPane1.setBorder(new ImagenFondo());
+        
+        
     }
+    public void run(){
+    Thread ct = Thread.currentThread();
+    while(ct == h1) {
+    calcula();
+   jLabel1.setText(hora + ":" + minutos + ":" + segundos + " "+ampm);
+   try {
+   Thread.sleep(1000);
+}    catch(InterruptedException e) {}
+}
+}
+    
+   public void calcula () {
+Calendar calendario = new GregorianCalendar();
+Date fechaHoraActual = new Date();
+
+calendario.setTime(fechaHoraActual);
+ampm = calendario.get(Calendar.AM_PM)==Calendar.AM?"AM":"PM";
+if(ampm.equals("PM")){
+int h = calendario.get(Calendar.HOUR_OF_DAY)-12;
+hora = h>9?""+h:"0"+h;
+}else{
+hora = calendario.get(Calendar.HOUR_OF_DAY)>9?""+calendario.get(Calendar.HOUR_OF_DAY):"0"+calendario.get(Calendar.HOUR_OF_DAY); }
+minutos = calendario.get(Calendar.MINUTE)>9?""+calendario.get(Calendar.MINUTE):"0"+calendario.get(Calendar.MINUTE);
+segundos = calendario.get(Calendar.SECOND)>9?""+calendario.get(Calendar.SECOND):"0"+calendario.get(Calendar.SECOND);
+h1 = new Thread(this);
+h1.start();
+ //Titulo del frame
+//setLocationRelativeTo(null); //Para centrar la ventana
+setVisible(true);
+}
+   
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -30,30 +76,104 @@ public class Principal extends javax.swing.JFrame {
     private void initComponents() {
 
         jDesktopPane1 = new javax.swing.JDesktopPane();
+        jLabel1 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        registro = new javax.swing.JMenu();
+        documentos = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
+        jMenuItem4 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(102, 102, 102));
+
+        jDesktopPane1.setBackground(new java.awt.Color(102, 102, 102));
+        jDesktopPane1.setForeground(new java.awt.Color(102, 102, 102));
+        jDesktopPane1.setDesktopManager(null);
+
+        jLabel1.addContainerListener(new java.awt.event.ContainerAdapter() {
+            public void componentAdded(java.awt.event.ContainerEvent evt) {
+                jLabel1ComponentAdded(evt);
+            }
+        });
+
+        jDesktopPane1.setLayer(jLabel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jDesktopPane1Layout = new javax.swing.GroupLayout(jDesktopPane1);
         jDesktopPane1.setLayout(jDesktopPane1Layout);
         jDesktopPane1Layout.setHorizontalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 719, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jDesktopPane1Layout.createSequentialGroup()
+                .addContainerGap(513, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(170, 170, 170))
         );
         jDesktopPane1Layout.setVerticalGroup(
             jDesktopPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 510, Short.MAX_VALUE)
+            .addGroup(jDesktopPane1Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(440, Short.MAX_VALUE))
         );
 
-        jMenu1.setText("SISTEMA");
+        jMenu1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/clipboard105 (1).png"))); // NOI18N
+        jMenu1.setText("REGISTROS");
+        jMenu1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu1MouseClicked(evt);
+            }
+        });
+        jMenu1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenu1ActionPerformed(evt);
+            }
+        });
+
+        registro.setText("REGISTRO DE EMPLEADOS");
+        registro.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                registroMenuSelected(evt);
+            }
+        });
+        registro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                registroMousePressed(evt);
+            }
+        });
+        registro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                registroActionPerformed(evt);
+            }
+        });
+        jMenu1.add(registro);
+
+        documentos.setText("AGREGAR DOCUMENTOS");
+        documentos.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                documentosMousePressed(evt);
+            }
+        });
+        documentos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                documentosActionPerformed(evt);
+            }
+        });
+        jMenu1.add(documentos);
+
         jMenuBar1.add(jMenu1);
 
+        jMenu2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/search102.png"))); // NOI18N
         jMenu2.setText("BUSQUEDA");
 
-        jMenuItem1.setText("Bus");
+        jMenuItem1.setText("BUSQUEDA DE PERSONAL");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -63,13 +183,32 @@ public class Principal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Iconos/cardboard17.png"))); // NOI18N
+        jMenu3.setText("MANTENIMIENTO");
+
+        jMenuItem2.setText("REGISTRO DE USUARIOS");
+        jMenu3.add(jMenuItem2);
+
+        jMenuItem3.setText("CONSULTA");
+        jMenu3.add(jMenuItem3);
+
+        jMenuItem4.setText("TIPO DOCUMENTO");
+        jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem4);
+
+        jMenuBar1.add(jMenu3);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jDesktopPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(jDesktopPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -80,16 +219,67 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
+        // interface de busqueda
         busqueda b=new busqueda();
         this.jDesktopPane1.add(b);
         b.setVisible(true);
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
+    private void registroMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_registroMenuSelected
+        // TODO add your handling code here:
+       
+    }//GEN-LAST:event_registroMenuSelected
+
+    private void registroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_registroActionPerformed
+
+        
+      // TODO add your handling code here:
+    }//GEN-LAST:event_registroActionPerformed
+
+    private void jMenu1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu1MouseClicked
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jMenu1MouseClicked
+
+    private void registroMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registroMousePressed
+       Empleados u=new Empleados();
+        this.jDesktopPane1.add(u);
+        u.setVisible(true);
+
+        // interface de usuarios
+    }//GEN-LAST:event_registroMousePressed
+
+    private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenu1ActionPerformed
+        
+   // TODO add your handling code here:
+    }//GEN-LAST:event_jMenu1ActionPerformed
+
+    private void documentosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_documentosActionPerformed
+       // TODO add your handling code here:
+    }//GEN-LAST:event_documentosActionPerformed
+
+    private void documentosMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_documentosMousePressed
+       RegistroTipoDoc r=new RegistroTipoDoc();
+        this.jDesktopPane1.add(r);
+        r.setVisible(true);   // TODO add your handling code here:
+    }//GEN-LAST:event_documentosMousePressed
+
+    private void jLabel1ComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_jLabel1ComponentAdded
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel1ComponentAdded
+
+    private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        RegistroTipoDoc c=new RegistroTipoDoc();
+        jDesktopPane1.add(c);
+        c.show();
+    }//GEN-LAST:event_jMenuItem4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
+          new Principal();
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -117,15 +307,26 @@ public class Principal extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Principal().setVisible(true);
+              
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDesktopPane jDesktopPane1;
+    private javax.swing.JMenu documentos;
+    public static javax.swing.JDesktopPane jDesktopPane1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
+    private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenu registro;
     // End of variables declaration//GEN-END:variables
+
+
+   
 }
